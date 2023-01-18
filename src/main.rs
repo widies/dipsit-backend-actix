@@ -1,5 +1,5 @@
 use actix_cors::Cors;
-use actix_web::{get, App, HttpServer, HttpResponse, Responder, http};
+use actix_web::{get, App, HttpServer, HttpResponse, Responder, http, middleware::Logger};
 use std::{io::Result, env};
 
 #[get("/")]
@@ -11,6 +11,7 @@ async fn index() -> impl Responder {
 async fn main() -> Result<()> {
     dotenv::dotenv().expect("Failed to read .env file");
     env::set_var("RUST_LOG", "actix_web=debug");
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let app_host = env::var("SERVER_HOST").expect("SERVER_HOST Not Found !.");
     let app_port = env::var("SERVER_PORT").expect("SERVER_PORT Not Found !.");
@@ -20,6 +21,7 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .wrap(
                 Cors::default()
                     .allowed_origin(&origin)
