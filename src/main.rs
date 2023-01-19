@@ -1,6 +1,11 @@
 use actix_cors::Cors;
-use actix_web::{get, App, HttpServer, HttpResponse, Responder, http, middleware::Logger};
-use std::{io::Result, env};
+use actix_web::{get, http, middleware::Logger, App, HttpResponse, HttpServer, Responder};
+use std::{env, io::Result};
+
+mod controllers;
+mod helpers;
+mod routes;
+mod services;
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -36,6 +41,7 @@ async fn main() -> Result<()> {
                     .max_age(3600),
             )
             .service(index)
+            .configure(routes::router::config_services)
     })
     .bind(&app_url)?
     .run()
